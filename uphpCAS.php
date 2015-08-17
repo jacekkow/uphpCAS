@@ -26,10 +26,12 @@ class uphpCAS {
 			$port = 0;
 			if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
 				$url = 'https://';
-				if(isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != '443') {
+				if(isset($_SERVER['SERVER_PORT'])
+						&& $_SERVER['SERVER_PORT'] != '443') {
 					$port = $_SERVER['SERVER_PORT'];
 				}
-			} elseif(isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != '80') {
+			} elseif(isset($_SERVER['SERVER_PORT'])
+					&& $_SERVER['SERVER_PORT'] != '80') {
 				$port = $_SERVER['SERVER_PORT'];
 			}
 			
@@ -92,13 +94,16 @@ class uphpCAS {
 			),
 			'ssl' => array(
 				'verify_peer' => TRUE,
-				'allow_self_signed' => FALSE,
+				'verify_peer_name' => TRUE,
 				'verify_depth' => 5,
-				'ciphers' => 'HIGH:-MD5:-aNULL:-DES',
+				'allow_self_signed' => FALSE,
+				'disable_compression' => TRUE,
 			),
 		);
 		
-		$data = file_get_contents($this->serverUrl.'/serviceValidate?service='.urlencode($this->serviceUrl).'&ticket='.urlencode($ticket),
+		$data = file_get_contents($this->serverUrl
+					.'/serviceValidate?service='.urlencode($this->serviceUrl)
+					.'&ticket='.urlencode($ticket),
 				FALSE, stream_context_create($context));
 		if($data === FALSE) {
 			throw new JasigException('Authentication error: CAS server is unavailable');
@@ -111,19 +116,20 @@ class uphpCAS {
 			$xml->loadXML($data);
 			
 			foreach(libxml_get_errors() as $error) {
-				$e = new ErrorException($error->message, $error->code, 1, $error->file, $error->line);
+				$e = new ErrorException($error->message, $error->code, 1,
+						$error->file, $error->line);
 				switch ($error->level) {
 					case LIBXML_ERR_ERROR:
-						throw new Exception('Fatal error during XML parsing', 0, $e);
-						break;
 					case LIBXML_ERR_FATAL:
-						throw new Exception('Fatal error during XML parsing', 0, $e);
+						throw new Exception('Fatal error during XML parsing',
+								0, $e);
 						break;
 				}
 			}
 		}
 		catch(Exception $e) {
-			throw new JasigException('Authentication error: CAS server response invalid - parse error', 0, $e);
+			throw new JasigException('Authentication error: CAS server'
+					.' response invalid - parse error', 0, $e);
 		} finally {
 			libxml_clear_errors();
 			libxml_disable_entity_loader($xmlEntityLoader);
@@ -136,23 +142,28 @@ class uphpCAS {
 		if($failure->length > 0) {
 			$failure = $failure->item(0);
 			if(!($failure instanceof DOMElement)) {
-				throw new JasigException('Authentication error: CAS server response invalid - authenticationFailure');
+				throw new JasigException('Authentication error: CAS server'
+						.' response invalid - authenticationFailure');
 			}
-			throw new JasigAuthException('Authentication error: '.$failure->textContent);
+			throw new JasigAuthException('Authentication error: '
+					.$failure->textContent);
 		} elseif($success->length > 0) {
 			$success = $success->item(0);
 			if(!($success instanceof DOMElement)) {
-				throw new JasigException('Authentication error: CAS server response invalid - authenticationSuccess');
+				throw new JasigException('Authentication error: CAS server'
+						.' response invalid - authenticationSuccess');
 			}
 			
 			$user = $success->getElementsByTagName('user');
 			if($user->length == 0) {
-				throw new JasigException('Authentication error: CAS server response invalid - user');
+				throw new JasigException('Authentication error: CAS server'
+						.' response invalid - user');
 			}
 			
 			$user = trim($user->item(0)->textContent);
 			if(strlen($user)<1) {
-				throw new JasigException('Authentication error: CAS server response invalid - user value');
+				throw new JasigException('Authentication error: CAS server'
+						.' response invalid - user value');
 			}
 			
 			$jusr = new JasigUser();
@@ -170,7 +181,8 @@ class uphpCAS {
 		}
 		else
 		{
-			throw new JasigException('Authentication error: CAS server response invalid - required tag not found');
+			throw new JasigException('Authentication error: CAS server'
+					.' response invalid - required tag not found');
 		}
 	}
 }
