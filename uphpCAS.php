@@ -53,7 +53,7 @@ class uphpCAS {
 	}
 	
 	public function loginUrl() {
-		return $this->serverUrl.'/login?service='.urlencode($this->serviceUrl);
+		return $this->serverUrl.'/login?method=POST&service='.urlencode($this->serviceUrl);
 	}
 	
 	public function logoutUrl() {
@@ -73,8 +73,8 @@ class uphpCAS {
 		session_start();
 		if(isset($_SESSION['uphpCAS-user'])) {
 			return $_SESSION['uphpCAS-user'];
-		} elseif(isset($_GET['ticket'])) {
-			$user = $this->verifyTicket($_GET['ticket']);
+		} elseif(isset($_REQUEST['ticket'])) {
+			$user = $this->verifyTicket($_REQUEST['ticket']);
 			$_SESSION['uphpCAS-user'] = $user;
 			return $user;
 		} else {
