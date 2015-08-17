@@ -101,6 +101,27 @@ class uphpCAS {
 			),
 		);
 		
+		if(version_compare(PHP_VERSION, '5.6', '<')) {
+			$cafiles = array(
+				'/etc/ssl/certs/ca-certificates.crt',
+				'/etc/ssl/certs/ca-bundle.crt',
+				'/etc/pki/tls/certs/ca-bundle.crt',
+			);
+			$cafile = NULL;
+			foreach($cafiles as $file) {
+				if(is_file($file)) {
+					$cafile = $file;
+					break;
+				}
+			}
+			
+			$url = parse_url($this->serverUrl);
+			$context['ssl']['cafile'] = $cafile;
+			$context['ssl']['ciphers'] = 'ECDH:DH:AES:CAMELLIA:!SSLv2:!aNULL'
+					.':!eNULL:!EXPORT:!DES:!3DES:!MD5:!RC4:!ADH:!PSK:!SRP';
+			$context['ssl']['CN_match'] = $url['host'];
+		}
+		
 		$data = file_get_contents($this->serverUrl
 					.'/serviceValidate?service='.urlencode($this->serviceUrl)
 					.'&ticket='.urlencode($ticket),
