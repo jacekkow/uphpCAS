@@ -46,10 +46,16 @@ class uphpCAS {
 		}
 	}
 	
+	public function getServerUrl($serverUrl) {
+		return $this->serverUrl;
+	}
 	public function setServerUrl($serverUrl) {
 		$this->serverUrl = $serverUrl;
 	}
 	
+	public function getServiceUrl() {
+		return $this->serviceUrl;
+	}
 	public function setServiceUrl($serviceUrl) {
 		$this->serviceUrl = $serviceUrl;
 	}
