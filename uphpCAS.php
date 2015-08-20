@@ -64,8 +64,8 @@ class uphpCAS {
 		return $this->serverUrl.'/login?method=POST&service='.urlencode($this->serviceUrl);
 	}
 	
-	public function logoutUrl() {
-		return $this->serverUrl.'/logout';
+	public function logoutUrl($returnUrl = NULL) {
+		return $this->serverUrl.'/logout'.($returnUrl ? '?service='.urlencode($returnUrl) : '');
 	}
 	
 	public function logout() {
