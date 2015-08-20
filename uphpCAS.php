@@ -71,9 +71,13 @@ class uphpCAS {
 		die();
 	}
 	
+	public function isAuthenticated() {
+		return isset($_SESSION['uphpCAS-user']);
+	}
+	
 	public function authenticate() {
 		session_start();
-		if(isset($_SESSION['uphpCAS-user'])) {
+		if($this->isAuthenticated()) {
 			return $_SESSION['uphpCAS-user'];
 		} elseif(isset($_REQUEST['ticket'])) {
 			$user = $this->verifyTicket($_REQUEST['ticket']);
