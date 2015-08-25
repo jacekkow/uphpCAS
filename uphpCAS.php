@@ -1,7 +1,7 @@
 <?php
 // Thrown when internal error occurs
 class JasigException extends Exception {}
-// Thrown when CAS server return authentication error
+// Thrown when CAS server returns authentication error
 class JasigAuthException extends JasigException {}
 
 class JasigUser {
@@ -157,8 +157,7 @@ class uphpCAS {
 						break;
 				}
 			}
-		}
-		catch(Exception $e) {
+		} catch(Exception $e) {
 			throw new JasigException('Authentication error: CAS server'
 					.' response invalid - parse error', 0, $e);
 		} finally {
@@ -192,7 +191,7 @@ class uphpCAS {
 			}
 			
 			$user = trim($user->item(0)->textContent);
-			if(strlen($user)<1) {
+			if(strlen($user) < 1) {
 				throw new JasigException('Authentication error: CAS server'
 						.' response invalid - user value');
 			}
@@ -209,9 +208,7 @@ class uphpCAS {
 			}
 			
 			return $jusr;
-		}
-		else
-		{
+		} else {
 			throw new JasigException('Authentication error: CAS server'
 					.' response invalid - required tag not found');
 		}
