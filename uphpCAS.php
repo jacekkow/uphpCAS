@@ -13,8 +13,9 @@ class uphpCAS {
 	const VERSION = '1.0';
 	protected $serverUrl = '';
 	protected $serviceUrl;
+	protected $sessionName = 'uphpCAS-user';
 	
-	function __construct($serverUrl = NULL, $serviceUrl = NULL) {
+	function __construct($serverUrl = NULL, $serviceUrl = NULL, $sessionName = NULL) {
 		if($serverUrl != NULL) {
 			$this->serverUrl = rtrim($serverUrl, '/');
 		}
@@ -44,6 +45,10 @@ class uphpCAS {
 			
 			$this->serviceUrl = $url;
 		}
+		
+		if($sessionName) {
+			$this->sessionName = $sessionName;
+		}
 	}
 	
 	public function getServerUrl() {
@@ -60,6 +65,13 @@ class uphpCAS {
 		$this->serviceUrl = $serviceUrl;
 	}
 	
+	public function getSessionName($sessionName) {
+		return $this->sessionName;
+	}
+	public function setSessionName($sessionName) {
+		$this->sessionName = $sessionName;
+	}
+	
 	public function loginUrl() {
 		return $this->serverUrl.'/login?method=POST&service='.urlencode($this->serviceUrl);
 	}
@@ -71,7 +83,7 @@ class uphpCAS {
 	public function logout($returnUrl = NULL) {
 		session_start();
 		if($this->isAuthenticated()) {
-			unset($_SESSION['uphpCAS-user']);
+			unset($_SESSION[$this->sessionName]);
 			header('Location: '.$this->logoutUrl($returnUrl));
 			die();
 		} elseif($returnUrl) {
@@ -81,16 +93,16 @@ class uphpCAS {
 	}
 	
 	public function isAuthenticated() {
-		return isset($_SESSION['uphpCAS-user']);
+		return isset($_SESSION[$this->sessionName]);
 	}
 	
 	public function authenticate() {
 		session_start();
 		if($this->isAuthenticated()) {
-			return $_SESSION['uphpCAS-user'];
+			return $_SESSION[$this->sessionName];
 		} elseif(isset($_REQUEST['ticket'])) {
 			$user = $this->verifyTicket($_REQUEST['ticket']);
-			$_SESSION['uphpCAS-user'] = $user;
+			$_SESSION[$this->sessionName] = $user;
 			return $user;
 		} else {
 			header('Location: '.$this->loginUrl());
