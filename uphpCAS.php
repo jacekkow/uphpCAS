@@ -46,7 +46,7 @@ class uphpCAS {
 		}
 	}
 	
-	public function getServerUrl($serverUrl) {
+	public function getServerUrl() {
 		return $this->serverUrl;
 	}
 	public function setServerUrl($serverUrl) {
