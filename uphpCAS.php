@@ -67,7 +67,7 @@ class uphpCAS {
 		$this->serviceUrl = $serviceUrl;
 	}
 	
-	public function getSessionName($sessionName) {
+	public function getSessionName() {
 		return $this->sessionName;
 	}
 	public function setSessionName($sessionName) {
