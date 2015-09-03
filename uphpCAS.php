@@ -23,32 +23,34 @@ class uphpCAS {
 		if($serviceUrl != NULL) {
 			$this->serviceUrl = $serviceUrl;
 		} else {
-			$url = 'http://';
-			$port = 0;
-			if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-				$url = 'https://';
-				if(isset($_SERVER['SERVER_PORT'])
-						&& $_SERVER['SERVER_PORT'] != '443') {
-					$port = $_SERVER['SERVER_PORT'];
-				}
-			} elseif(isset($_SERVER['SERVER_PORT'])
-					&& $_SERVER['SERVER_PORT'] != '80') {
-				$port = $_SERVER['SERVER_PORT'];
-			}
-			
-			$url .= $_SERVER['SERVER_NAME'];
-			
-			if($port != 0) {
-				$url .= ':'.$port;
-			}
-			$url .= $_SERVER['REQUEST_URI'];
-			
-			$this->serviceUrl = $url;
+			$this->serviceUrl = $this->getCurrentUrl();
 		}
 		
 		if($sessionName) {
 			$this->sessionName = $sessionName;
 		}
+	}
+	
+	public function getCurrentUrl() {
+		$url = 'http://';
+		$port = 0;
+		if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+			$url = 'https://';
+			if(isset($_SERVER['SERVER_PORT'])
+					&& $_SERVER['SERVER_PORT'] != '443') {
+				$port = $_SERVER['SERVER_PORT'];
+			}
+		} elseif(isset($_SERVER['SERVER_PORT'])
+				&& $_SERVER['SERVER_PORT'] != '80') {
+			$port = $_SERVER['SERVER_PORT'];
+		}
+		
+		$url .= $_SERVER['SERVER_NAME'];
+		
+		if($port != 0) {
+			$url .= ':'.$port;
+		}
+		$url .= $_SERVER['REQUEST_URI'];
 	}
 	
 	public function getServerUrl() {
