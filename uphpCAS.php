@@ -68,13 +68,16 @@ class uphpCAS {
 		return $this->serverUrl.'/logout'.($returnUrl ? '?service='.urlencode($returnUrl) : '');
 	}
 	
-	public function logout() {
+	public function logout($returnUrl = NULL) {
 		session_start();
-		if(isset($_SESSION['uphpCAS-user'])) {
+		if($this->isAuthenticated()) {
 			unset($_SESSION['uphpCAS-user']);
+			header('Location: '.$this->logoutUrl($returnUrl));
+			die();
+		} elseif($returnUrl) {
+			header('Location: '.$returnUrl);
+			die();
 		}
-		header('Location: '.$this->logoutUrl());
-		die();
 	}
 	
 	public function isAuthenticated() {
