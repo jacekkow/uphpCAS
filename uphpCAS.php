@@ -130,8 +130,8 @@ class uphpCAS {
 		return $cafile;
 	}
 	
-	public function verifyTicket($ticket) {
-		$context = array(
+	protected function createStreamContext($hostname) {
+		$context = stream_context_create(array(
 			'http' => array(
 				'method' => 'GET',
 				'user_agent' => 'uphpCAS/'.self::VERSION,
@@ -144,20 +144,29 @@ class uphpCAS {
 				'allow_self_signed' => FALSE,
 				'disable_compression' => TRUE,
 			),
-		);
+		));
 		
 		if(version_compare(PHP_VERSION, '5.6', '<')) {
-			$url = parse_url($this->serverUrl);
-			$context['ssl']['cafile'] = $this->findCaFile();
-			$context['ssl']['ciphers'] = 'ECDH:DH:AES:CAMELLIA:!SSLv2:!aNULL'
-					.':!eNULL:!EXPORT:!DES:!3DES:!MD5:!RC4:!ADH:!PSK:!SRP';
-			$context['ssl']['CN_match'] = $url['host'];
+			stream_context_set_option($context, array(
+				'ssl' => array(
+					'cafile' => $this->findCaFile(),
+					'ciphers' => 'ECDH:DH:AES:CAMELLIA:!SSLv2:!aNULL:!eNULL'
+						.':!EXPORT:!DES:!3DES:!MD5:!RC4:!ADH:!PSK:!SRP',
+					'CN_match' => $hostname,
+				),
+			));
 		}
+		
+		return $context;
+	}
+	
+	public function verifyTicket($ticket) {
+		$url = parse_url($this->serverUrl);
+		$context = $this->createStreamContext($url['host']);
 		
 		$data = file_get_contents($this->serverUrl
 					.'/serviceValidate?service='.urlencode($this->serviceUrl)
-					.'&ticket='.urlencode($ticket),
-				FALSE, stream_context_create($context));
+					.'&ticket='.urlencode($ticket), FALSE, $context);
 		if($data === FALSE) {
 			throw new JasigException('Authentication error: CAS server is unavailable');
 		}
