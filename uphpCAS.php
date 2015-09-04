@@ -14,6 +14,8 @@ class uphpCAS {
 	protected $serverUrl = '';
 	protected $serviceUrl;
 	protected $sessionName = 'uphpCAS-user';
+	protected $method = 'POST';
+	protected $caFile = NULL;
 	
 	function __construct($serverUrl = NULL, $serviceUrl = NULL, $sessionName = NULL) {
 		if($serverUrl != NULL) {
@@ -28,6 +30,10 @@ class uphpCAS {
 		
 		if($sessionName) {
 			$this->sessionName = $sessionName;
+		}
+		
+		if(version_compare(PHP_VERSION, '5.6', '<')) {
+			$this->caFile = $this->findCaFile();
 		}
 	}
 	
@@ -76,12 +82,35 @@ class uphpCAS {
 		$this->sessionName = $sessionName;
 	}
 	
+	public function getMethod() {
+		return $this->method;
+	}
+	public function setMethod($method) {
+		if($method != 'GET' && $method != 'POST') {
+			throw new DomainException('Unsupported CAS response'
+				.' method: '.$method);
+		}
+		$this->method = $method;
+	}
+	
+	public function getCaFile() {
+		return $this->caFile;
+	}
+	public function setCaFile($caFile) {
+		if(!is_file($caFile)) {
+			throw new DomainException('Invalid CA file: '.$caFile);
+		}
+		$this->caFile = $caFile;
+	}
+	
 	public function loginUrl() {
-		return $this->serverUrl.'/login?method=POST&service='.urlencode($this->serviceUrl);
+		return $this->serverUrl.'/login?method='.$this->method
+			.'&service='.urlencode($this->serviceUrl);
 	}
 	
 	public function logoutUrl($returnUrl = NULL) {
-		return $this->serverUrl.'/logout'.($returnUrl ? '?service='.urlencode($returnUrl) : '');
+		return $this->serverUrl.'/logout'
+			.($returnUrl ? '?service='.urlencode($returnUrl) : '');
 	}
 	
 	public function logout($returnUrl = NULL) {
@@ -133,7 +162,7 @@ class uphpCAS {
 	}
 	
 	protected function createStreamContext($hostname) {
-		$context = stream_context_create(array(
+		$context = array(
 			'http' => array(
 				'method' => 'GET',
 				'user_agent' => 'uphpCAS/'.self::VERSION,
@@ -146,20 +175,19 @@ class uphpCAS {
 				'allow_self_signed' => FALSE,
 				'disable_compression' => TRUE,
 			),
-		));
+		);
 		
-		if(version_compare(PHP_VERSION, '5.6', '<')) {
-			stream_context_set_option($context, array(
-				'ssl' => array(
-					'cafile' => $this->findCaFile(),
-					'ciphers' => 'ECDH:DH:AES:CAMELLIA:!SSLv2:!aNULL:!eNULL'
-						.':!EXPORT:!DES:!3DES:!MD5:!RC4:!ADH:!PSK:!SRP',
-					'CN_match' => $hostname,
-				),
-			));
+		if($this->caFile) {
+			$context['ssl']['cafile'] = $this->caFile;
 		}
 		
-		return $context;
+		if(version_compare(PHP_VERSION, '5.6', '<')) {
+			$context['ssl']['ciphers'] = 'ECDH:DH:AES:CAMELLIA:!SSLv2:!aNULL'
+				.':!eNULL:!EXPORT:!DES:!3DES:!MD5:!RC4:!ADH:!PSK:!SRP';
+			$context['ssl']['CN_match'] = $hostname;
+		}
+		
+		return stream_context_create($context);
 	}
 	
 	public function verifyTicket($ticket) {
