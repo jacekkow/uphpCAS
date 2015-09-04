@@ -51,6 +51,8 @@ class uphpCAS {
 			$url .= ':'.$port;
 		}
 		$url .= $_SERVER['REQUEST_URI'];
+		
+		return $url;
 	}
 	
 	public function getServerUrl() {
