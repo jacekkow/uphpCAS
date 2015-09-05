@@ -56,7 +56,16 @@ class uphpCAS {
 		if($port != 0) {
 			$url .= ':'.$port;
 		}
+		
 		$url .= $_SERVER['REQUEST_URI'];
+		
+		if(isset($_GET['ticket'])) {
+			$pos = max(
+				strrpos($url, '?ticket='),
+				strrpos($url, '&ticket=')
+			);
+			$url = substr($url, 0, $pos);
+		}
 		
 		return $url;
 	}
