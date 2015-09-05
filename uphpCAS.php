@@ -123,7 +123,7 @@ class uphpCAS {
 	}
 	
 	public function logout($returnUrl = NULL) {
-		session_start();
+		@session_start();
 		if($this->isAuthenticated()) {
 			unset($_SESSION[$this->sessionName]);
 			header('Location: '.$this->logoutUrl($returnUrl));
@@ -139,7 +139,7 @@ class uphpCAS {
 	}
 	
 	public function authenticate() {
-		session_start();
+		@session_start();
 		if($this->isAuthenticated()) {
 			return $_SESSION[$this->sessionName];
 		} elseif(isset($_REQUEST['ticket'])) {
