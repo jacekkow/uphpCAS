@@ -2,6 +2,8 @@
 
 Simple PHP library for CAS authentication
 
+[![Build Status](https://travis-ci.org/jacekkow/uphpCAS.svg?branch=master)](https://travis-ci.org/jacekkow/uphpCAS)
+
 ## Introduction
 
 This library intends to be a replacement for overly complex
