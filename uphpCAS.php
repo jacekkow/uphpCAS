@@ -228,13 +228,15 @@ class uphpCAS {
 				}
 			}
 		} catch(Exception $e) {
-			throw new JasigException('Authentication error: CAS server'
-					.' response invalid - parse error', 0, $e);
-		} finally {
 			libxml_clear_errors();
 			libxml_disable_entity_loader($xmlEntityLoader);
 			libxml_use_internal_errors($xmlInternalErrors);
+			throw new JasigException('Authentication error: CAS server'
+					.' response invalid - parse error', 0, $e);
 		}
+		libxml_clear_errors();
+		libxml_disable_entity_loader($xmlEntityLoader);
+		libxml_use_internal_errors($xmlInternalErrors);
 		
 		$failure = $xml->getElementsByTagName('authenticationFailure');
 		$success = $xml->getElementsByTagName('authenticationSuccess');
