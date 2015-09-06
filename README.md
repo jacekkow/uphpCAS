@@ -133,7 +133,7 @@ $cas->setServiceUrl('https://service.local/subpage');
 or second argument of the constructor:
 
 ```php
-$cas = new uphpCAS('https://cas.server.local/cas'),
+$cas = new uphpCAS('https://cas.server.local/cas',
 	'https://service.local/subpage');
 ```
 
