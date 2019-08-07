@@ -148,6 +148,7 @@ class uphpCAS {
 			return $_SESSION[$this->sessionName];
 		} elseif(isset($_REQUEST['ticket'])) {
 			$user = $this->verifyTicket($_REQUEST['ticket']);
+			session_regenerate_id();
 			$_SESSION[$this->sessionName] = $user;
 			return $user;
 		} else {
