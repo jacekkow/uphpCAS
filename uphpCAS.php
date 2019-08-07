@@ -122,10 +122,14 @@ class uphpCAS {
 			.($returnUrl ? '?service='.urlencode($returnUrl) : '');
 	}
 	
-	public function logout($returnUrl = NULL) {
+	public function logoutLocal() {
 		@session_start();
+		unset($_SESSION[$this->sessionName]);
+	}
+	
+	public function logout($returnUrl = NULL) {
+		$this->logoutLocal();
 		if($this->isAuthenticated()) {
-			unset($_SESSION[$this->sessionName]);
 			header('Location: '.$this->logoutUrl($returnUrl));
 			die();
 		} elseif($returnUrl) {
