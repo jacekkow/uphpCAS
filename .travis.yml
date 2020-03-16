@@ -1,15 +1,18 @@
 language: php
 php:
-  - 5.4
-  - 5.5
   - 5.6
   - 7.0
+  - 7.1
+  - 7.2
+  - 7.3
+  - 7.4
   - nightly
 
 sudo: required
 
 install:
   - git clone https://github.com/jacekkow/uphpCAS-tests tests
+  - sudo ./tests/install_root.sh
   - ./tests/install.sh
 
 script:
