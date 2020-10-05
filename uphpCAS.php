@@ -14,6 +14,7 @@ class uphpCAS {
 	protected $serverUrl = '';
 	protected $serviceUrl;
 	protected $sessionName = 'uphpCAS-user';
+	protected $sessionStarted = FALSE;
 	protected $method = 'POST';
 	protected $caFile = NULL;
 	
@@ -112,6 +113,23 @@ class uphpCAS {
 		$this->caFile = $caFile;
 	}
 	
+	public function session_start() {
+		if($this->sessionStarted) {
+			return TRUE;
+		}
+		if(version_compare(PHP_VERSION, '7.1.0', '<')) {
+			@session_start();
+		} else {
+			if(!isset($_SESSION)) {
+				if(!session_start()) {
+					throw new RuntimeException('Cannot start session');
+				}
+			}
+		}
+		$this->sessionStarted = TRUE;
+		return TRUE;
+	}
+	
 	public function loginUrl() {
 		return $this->serverUrl.'/login?method='.$this->method
 			.'&service='.urlencode($this->serviceUrl);
@@ -123,7 +141,7 @@ class uphpCAS {
 	}
 	
 	public function logoutLocal() {
-		@session_start();
+		$this->session_start();
 		unset($_SESSION[$this->sessionName]);
 	}
 	
@@ -139,11 +157,12 @@ class uphpCAS {
 	}
 	
 	public function isAuthenticated() {
+		$this->session_start();
 		return isset($_SESSION[$this->sessionName]);
 	}
 	
 	public function authenticate() {
-		@session_start();
+		$this->session_start();
 		if($this->isAuthenticated()) {
 			return $_SESSION[$this->sessionName];
 		} elseif(isset($_REQUEST['ticket'])) {
